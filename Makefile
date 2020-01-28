@@ -27,12 +27,12 @@ TARGETS ?= darwin/amd64 linux/amd64 linux/386 linux/arm linux/arm64 linux/ppc64l
 DIST_DIRS         = find * -type d -exec
 
 GOOS ?= $(shell go env GOOS)
-VERSION ?= $(shell git describe --exact-match 2> /dev/null || \
+VERSION ?= $(shell git describe --exact-match --tags 2> /dev/null || \
                  git describe --match=$(git rev-parse --short=8 HEAD) --always --dirty --abbrev=8)
 GOFLAGS   :=
 TAGS      :=
 LDFLAGS   := "-w -s -X 'k8s.io/cloud-provider-openstack/pkg/version.Version=${VERSION}'"
-REGISTRY ?= k8scloudprovider
+REGISTRY ?= flant
 
 # CTI targets
 
