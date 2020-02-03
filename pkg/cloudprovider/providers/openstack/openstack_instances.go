@@ -120,7 +120,7 @@ func (i *Instances) NodeAddressesByProviderID(ctx context.Context, providerID st
 // If false is returned with no error, the instance will be immediately deleted by the cloud controller manager.
 func (i *Instances) InstanceExistsByProviderID(ctx context.Context, providerID string) (bool, error) {
 	instanceID, err := instanceIDFromProviderID(providerID)
-	if stderrors.Is(err, errPreExistingNode) {
+	if stderrors.Is(err, errStaticNode) {
 		return true, nil
 	} else if err != nil {
 		return false, err
@@ -229,14 +229,14 @@ func srvInstanceType(srv *servers.Server) (string, error) {
 // If Instances.InstanceID or cloudprovider.GetInstanceProviderID is changed, the regexp should be changed too.
 var providerIDRegexp = regexp.MustCompile(`^` + ProviderName + `:///([^/]+)$`)
 
-var errPreExistingNode = stderrors.New("pre-existing Node detected")
+var errStaticNode = stderrors.New("static Node detected")
 
 // instanceIDFromProviderID splits a provider's id and return instanceID.
 // A providerID is build out of '${ProviderName}:///${instance-id}'which contains ':///'.
 // See cloudprovider.GetInstanceProviderID and Instances.InstanceID.
 func instanceIDFromProviderID(providerID string) (instanceID string, err error) {
-	if providerID == "pre-existing-node" {
-		return "", errPreExistingNode
+	if providerID == "static://" {
+		return "", errStaticNode
 	}
 
 	// https://github.com/kubernetes/kubernetes/issues/85731
